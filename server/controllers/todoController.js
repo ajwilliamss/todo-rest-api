@@ -17,17 +17,17 @@ const getTodos = async (req, res) => {
 // @access  Private
 const addTodos = async (req, res) => {
   try {
-    if (!req.body.text) {
+    const { text } = req.body;
+    if (!text) {
       res.status(400);
       throw new Error("Please add text");
-    } else {
-      const todo = await Todo.create({
-        text: req.body.text,
-      });
-      res.status(200).json(todo);
     }
+
+    const todo = await Todo.create({ text });
+    res.status(200).json(todo);
   } catch (error) {
     console.log(error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -41,16 +41,15 @@ const updateTodo = async (req, res) => {
     if (!todo) {
       res.status(400);
       throw new Error("Todo not found");
-    } else {
-      const updatedTodo = await Todo.findByIdAndUpdate(
-        req.params.id,
-        req.body,
-        { new: true }
-      );
-      res.status(200).json(updatedTodo);
     }
+
+    const updatedTodo = await Todo.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+    });
+    res.status(200).json(updatedTodo);
   } catch (error) {
     console.log(error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -64,13 +63,15 @@ const completeTodo = async (req, res) => {
     if (!todo) {
       res.status(400);
       throw new Error("Todo not found");
-    } else {
-      todo.completed = !todo.completed;
-      todo.save();
-      res.status(200).json(todo);
     }
+
+    todo.completed = !todo.completed;
+    todo.save();
+
+    res.status(200).json(todo);
   } catch (error) {
     console.log(error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -84,12 +85,13 @@ const deleteTodo = async (req, res) => {
     if (!todo) {
       res.status(400);
       throw new Error("Todo not found");
-    } else {
-      const deletedTodo = await Todo.findByIdAndDelete(req.params.id);
-      res.status(200).json(deletedTodo);
     }
+
+    const deletedTodo = await Todo.findByIdAndDelete(req.params.id);
+    res.status(200).json(deletedTodo);
   } catch (error) {
     console.log(error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
